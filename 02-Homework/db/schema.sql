@@ -48,7 +48,7 @@ VALUES
 ("MASSAGE THERAPIST", 42000, 4),
 ("FRONT DESK RECEPTIONIST", 46000, 5);
 
-INSERT INTO employee (first_name,last_name,department_id,manager_id,role_id)
+INSERT INTO employee (first_name,last_name,department_id)
 VALUES
 ("JOHN","CHASE", 3, 5, 6),
 ("TED", "MOLSBY", 1, 2, 4),
