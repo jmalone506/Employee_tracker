@@ -68,6 +68,7 @@ function viewEmployee(){
     var query = "SELECT role_id, first_name, last_name, title, salary, dept FROM employee INNER JOIN role ON employee.role_id = role.id INNER join department ON role.department_id = department.id";
     connection.query(query, function(err, res){
         if (err) throw err;
+        console.table("\n" + "-------------------------------")
         console.table(res)
         start();
     });
@@ -77,7 +78,8 @@ function viewDepartment(){
     var query = "SELECT * FROM department";
     connection.query(query,function(err,res){
         if (err) throw err;
-        console.table(res);
+        console.table("\n" + "-------------------------------")
+        console.table(res)
         start();
     })
 }
@@ -85,6 +87,7 @@ function viewRole(){
     var query = "SELECT * FROM role INNER JOIN department ON role.department_id = department.id";
     connection.query(query,function(err,res){
         if (err) throw err;
+        console.table("\n" + "-------------------------------")
         console.table(res)
         start();
     });
