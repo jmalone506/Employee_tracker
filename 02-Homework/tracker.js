@@ -1,6 +1,6 @@
 var mysql = require("mysql")
 var inquirer = require("inquirer")
-
+require("console.table")
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -11,6 +11,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err){
     if (err) throw err;
+    
     start();
 });
 
@@ -31,6 +32,7 @@ function start(){
             "View Employee",
             "Update Employee",
             "Exit",
+            
         ]
     })
     .then(function(answer){
@@ -57,13 +59,13 @@ function start(){
                 updateEmployee();
                 break;
                 case "Exit":
-                exit();
+                end()
                 break;
         }
     })
 }
 function viewEmployee(){
-    var query = "SELECT first_name, last_name, title, salary, dept FROM employee INNER join Role ON employee.role_id=Role.id INNER join department ON Role.department_id=department.id";
+    var query = "SELECT role_id, first_name, last_name, title, salary, dept FROM employee INNER JOIN role ON employee.role_id = role.id INNER join department ON role.department_id = department.id";
     connection.query(query, function(err, res){
         if (err) throw err;
         console.table(res)
@@ -80,16 +82,33 @@ function viewDepartment(){
     })
 }
 function viewRole(){
-    var query = "SELECT * FROM Role";
+    var query = "SELECT * FROM role INNER JOIN department ON role.department_id = department.id";
     connection.query(query,function(err,res){
         if (err) throw err;
         console.table(res)
         start();
     });
 }
-function addEmployee(){
+
+function addDepartment(){
     inquirer
     .prompt({
+        name: "createDepartment",
+        type: "input",
+        message: "Which Department would you like to be added?"
+    })
+    .then(function(answer){
+        var query = "INSERT INTO department(dept) VALUES (?)";
+        connection.query(query, answer.createDepartment, function(err, res){
+            if (err) throw err;
+            viewDepartment();
+            start();
+        });
+    });
+}
+function addEmployee(){
+    inquirer
+    .prompt([{
         name: "createEmployeeFn",
         type: "input",
         message: "What is your first name?"
@@ -105,27 +124,18 @@ function addEmployee(){
         type:"input",
         message:"what is your role ID?",
 
-    },)
+    },
+    {
+    name:"newManagerId",
+    type:"input",
+    message:"what is your manager ID?"
+    }
+])
     .then(function(answer){
-        var query = "INSERT INTO employee(first_name, last_name, department_id, role_id) VALUES (?,?,?)";
-        connection.query(query, answer.createEmployeeFn, answer.createEmployeeLn, answer.nameOfRole, function(err, res){
+        var query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)";
+        connection.query(query, answer.createEmployeeFn, answer.createEmployeeLn, answer.nameOfRole,answer.newManagerId, function(err, res){
             if (err) throw err;
             viewEmployee();
-        });
-    });
-}
-function addDepartment(){
-    inquirer
-    .prompt({
-        name: "createDepartment",
-        type: "input",
-        message: "Which Department would you like to be added?"
-    })
-    .then(function(answer){
-        var query = "INSERT INTO department(dept) VALUES (?)";
-        connection.query(query, answer.createDepartment, function(err, res){
-            if (err) throw err;
-            viewDepartment();
         });
     });
 }
